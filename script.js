@@ -64,74 +64,33 @@ document.addEventListener("DOMContentLoaded", () => {
       progressBar.style.width = `${eligibilityPercentage}%`;
     }
 
+    // Sharing logic should also be inside the setTimeout to get updated message
+    const resultMessageText = resultMessage.textContent;
+    const shareButtonTwitter = document.getElementById("share-button-twitter");
+    const shareButtonFacebook = document.getElementById("share-button-facebook");
+    const shareButtonWhatsapp = document.getElementById("share-button-whatsapp");
+    const shareButtonLinkedin = document.getElementById("share-button-linkedin");
+
+    const baseURL = window.location.origin + window.location.pathname;
+    const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessageText + " Check your eligibility at my website!")} ${baseURL}`;
+    const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseURL)}`;
+    const whatsappURL = `https://wa.me/?text=${encodeURIComponent(resultMessageText + " Check your eligibility at my website!")} ${baseURL}`;
+    const linkedinURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseURL)}`;
+
+    if (shareButtonTwitter) {
+      shareButtonTwitter.href = twitterURL;
+    }
+    if (shareButtonFacebook) {
+      shareButtonFacebook.href = facebookURL;
+    }
+    if (shareButtonWhatsapp) {
+      shareButtonWhatsapp.href = whatsappURL;
+    }
+    if (shareButtonLinkedin) {
+      shareButtonLinkedin.href = linkedinURL;
+    }
+
   }, 2000); // 2-second delay
-
-  // Countdown Timer Logic
-  const countdown = document.getElementById("countdown");
-  function updateCountdown(eventDate) {
-    const now = new Date();
-    const timeDiff = eventDate - now;
-
-    if (timeDiff <= 0) {
-      countdown.textContent = "The event is here!";
-      return;
-    }
-
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((timeDiff / (1000 * 60)) % 60);
-    const seconds = Math.floor((timeDiff / 1000) % 60);
-
-    countdown.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-  }
-
-  // Determine the event date based on the page
-  let eventDate;
-  if (document.body.classList.contains("christmas")) {
-    eventDate = new Date("2024-12-25T00:00:00"); // Christmas
-  } else if (document.body.classList.contains("eligibility-2025")) {
-    eventDate = new Date("2025-01-01T00:00:00"); // New Year's
-  } else if (document.body.classList.contains("valentine")) {
-    eventDate = new Date("2025-02-14T00:00:00"); // Valentine's Day
-  }
-
-  if (eventDate) {
-    setInterval(() => {
-      updateCountdown(eventDate);
-    }, 1000);
-  }
-
-  // Reload on pageshow to fix form retention issues
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
-      window.location.reload();
-    }
-  });
-
-  // Handle sharing functionality
-  const shareButtonTwitter = document.getElementById("share-button-twitter");
-  const shareButtonFacebook = document.getElementById("share-button-facebook");
-  const shareButtonWhatsapp = document.getElementById("share-button-whatsapp");
-  const shareButtonLinkedin = document.getElementById("share-button-linkedin");
-
-  const baseURL = window.location.origin + window.location.pathname;
-  const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessage + " Check your eligibility at my website!")} ${baseURL}`;
-  const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseURL)}`;
-  const whatsappURL = `https://wa.me/?text=${encodeURIComponent(resultMessage + " Check your eligibility at my website!")} ${baseURL}`;
-  const linkedinURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseURL)}`;
-
-  if (shareButtonTwitter) {
-    shareButtonTwitter.href = twitterURL;
-  }
-  if (shareButtonFacebook) {
-    shareButtonFacebook.href = facebookURL;
-  }
-  if (shareButtonWhatsapp) {
-    shareButtonWhatsapp.href = whatsappURL;
-  }
-  if (shareButtonLinkedin) {
-    shareButtonLinkedin.href = linkedinURL;
-  }
 
   // Theme toggle functionality
   const toggleThemeButton = document.getElementById("toggle-theme");
