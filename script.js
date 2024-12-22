@@ -1,13 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Select the form
+  // Select the form and reset it if it exists
   const form = document.getElementById("eligibility-form");
-
-  // Clear form inputs if the form exists
   if (form) {
     form.reset();
   }
 
-  // Existing logic for results page
+  // Calculate eligibility percentage
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const questions = urlParams.entries();
@@ -22,13 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Calculate eligibility percentage
   const eligibilityPercentage = Math.round((positiveAnswers / totalQuestions) * 100);
-
   const resultPercentage = document.getElementById("result-percentage");
   const resultMessage = document.getElementById("result-message");
 
-  // Show temporary "Not Eligible" message
   if (resultPercentage) {
     resultPercentage.textContent = "0% Eligible";
   }
@@ -36,13 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
     resultMessage.textContent = "You're not eligible.";
   }
 
-  // After 2 seconds, show the actual results
+  // Show the actual results after a delay
   setTimeout(() => {
     if (resultPercentage) {
       resultPercentage.textContent = `${eligibilityPercentage}% Eligible`;
     }
 
-    // Check if the page is Valentine or Christmas and display messages accordingly
     const isValentine = document.body.classList.contains("valentine");
     const isChristmas = document.body.classList.contains("christmas");
 
@@ -55,7 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
         resultMessage.textContent = "No gift for you enugbe!";
       }
     } else {
-      // Default eligibility message for other pages
       if (eligibilityPercentage === 100) {
         resultMessage.textContent = "Congratulations! You meet all the requirements.";
       } else if (eligibilityPercentage >= 50) {
@@ -64,11 +57,17 @@ document.addEventListener("DOMContentLoaded", () => {
         resultMessage.textContent = "Unfortunately, you do not meet the eligibility criteria. Want to try again?";
       }
     }
+
+    // Update the progress bar width
+    const progressBar = document.getElementById("progress-bar");
+    if (progressBar) {
+      progressBar.style.width = `${eligibilityPercentage}%`;
+    }
+
   }, 2000); // 2-second delay
 
   // Countdown Timer Logic
   const countdown = document.getElementById("countdown");
-
   function updateCountdown(eventDate) {
     const now = new Date();
     const timeDiff = eventDate - now;
@@ -107,35 +106,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.persisted) {
       window.location.reload();
     }
-    
-    // Assuming eligibilityPercentage is already calculated
+  });
 
-const progressBar = document.getElementById("progress-bar");
-
-// Update the progress bar width
-if (progressBar) {
-  progressBar.style.width = `${eligibilityPercentage}%`;
-}
-document.addEventListener("DOMContentLoaded", () => {
-  // Get the result message text
-  const resultMessage = document.getElementById("result-message").textContent;
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Get the result message and the share buttons
-  const resultMessage = document.getElementById("result-message").textContent;
-
+  // Handle sharing functionality
   const shareButtonTwitter = document.getElementById("share-button-twitter");
   const shareButtonFacebook = document.getElementById("share-button-facebook");
   const shareButtonWhatsapp = document.getElementById("share-button-whatsapp");
   const shareButtonLinkedin = document.getElementById("share-button-linkedin");
 
-  // Construct share URLs
-  const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessage + " Check your eligibility at my website!")}`;
-  const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-  const whatsappURL = `https://wa.me/?text=${encodeURIComponent(resultMessage + " Check your eligibility at my website!")}`;
-  const linkedinURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
+  const baseURL = window.location.origin + window.location.pathname;
+  const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessage + " Check your eligibility at my website!")} ${baseURL}`;
+  const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseURL)}`;
+  const whatsappURL = `https://wa.me/?text=${encodeURIComponent(resultMessage + " Check your eligibility at my website!")} ${baseURL}`;
+  const linkedinURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseURL)}`;
 
-  // Set the href attributes of the share buttons
   if (shareButtonTwitter) {
     shareButtonTwitter.href = twitterURL;
   }
@@ -148,32 +132,25 @@ document.addEventListener("DOMContentLoaded", () => {
   if (shareButtonLinkedin) {
     shareButtonLinkedin.href = linkedinURL;
   }
-});
-});
-document.addEventListener("DOMContentLoaded", () => {
-  // Get the toggle button and body element
+
+  // Theme toggle functionality
   const toggleThemeButton = document.getElementById("toggle-theme");
   const body = document.body;
-
-  // Check localStorage to set the theme on page load
   const savedTheme = localStorage.getItem("theme");
+
   if (savedTheme) {
-    body.classList.add(savedTheme); // Apply saved theme
+    body.classList.add(savedTheme);
   }
 
-  // Toggle between light and dark mode
   toggleThemeButton.addEventListener("click", () => {
     if (body.classList.contains("light-mode")) {
       body.classList.remove("light-mode");
       body.classList.add("dark-mode");
-      localStorage.setItem("theme", "dark-mode"); // Save dark mode
+      localStorage.setItem("theme", "dark-mode");
     } else {
       body.classList.remove("dark-mode");
       body.classList.add("light-mode");
-      localStorage.setItem("theme", "light-mode"); // Save light mode
+      localStorage.setItem("theme", "light-mode");
     }
-  });
-});
-
   });
 });
