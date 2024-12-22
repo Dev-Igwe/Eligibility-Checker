@@ -149,20 +149,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Form submit handler
   form.addEventListener("submit", (event) => {
-    event.preventDefault(); // Prevent the form from submitting traditionally
+    event.preventDefault(); // Prevent the default submission
 
     // Get form data
     const formData = new FormData(form);
     const answers = {};
 
     formData.forEach((value, key) => {
-      answers[key] = value;
+      answers[key] = value; // Store answers as key-value pairs
     });
 
     // Store the answers in localStorage
     localStorage.setItem("eligibilityAnswers", JSON.stringify(answers));
 
     // Redirect to the results page
-    window.location.href = "/results.html";
+    window.location.href = "/results.html"; // Use relative path to results page
   });
 });
