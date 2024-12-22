@@ -1,22 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Select the form and reset it if it exists
+  // Form reset
   const form = document.getElementById("eligibility-form");
   if (form) {
     form.reset();
   }
 
-  // Calculate eligibility percentage
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const questions = urlParams.entries();
-
+  // Retrieve answers from localStorage
+  const answers = JSON.parse(localStorage.getItem("eligibilityAnswers"));
+  
   let totalQuestions = 0;
   let positiveAnswers = 0;
-
-  for (const [key, value] of questions) {
-    totalQuestions++;
-    if (value.toLowerCase() === "yes") {
-      positiveAnswers++;
+  
+  if (answers) {
+    for (const key in answers) {
+      totalQuestions++;
+      if (answers[key].toLowerCase() === "yes") {
+        positiveAnswers++;
+      }
     }
   }
 
@@ -24,73 +24,51 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultPercentage = document.getElementById("result-percentage");
   const resultMessage = document.getElementById("result-message");
 
+  // Show eligibility results
   if (resultPercentage) {
-    resultPercentage.textContent = "0% Eligible";
+    resultPercentage.textContent = `${eligibilityPercentage}% Eligible`;
   }
+
+  // Show message based on eligibility
   if (resultMessage) {
-    resultMessage.textContent = "You're not eligible.";
+    resultMessage.textContent = eligibilityPercentage === 100
+      ? "Congratulations! You meet all the requirements."
+      : eligibilityPercentage >= 50
+      ? "You meet some of the requirements. Consider improving further."
+      : "Unfortunately, you do not meet the eligibility criteria. Want to try again?";
   }
 
-  // Show the actual results after a delay
-  setTimeout(() => {
-    if (resultPercentage) {
-      resultPercentage.textContent = `${eligibilityPercentage}% Eligible`;
-    }
+  // Update progress bar
+  const progressBar = document.getElementById("progress-bar");
+  if (progressBar) {
+    progressBar.style.width = `${eligibilityPercentage}%`;
+  }
 
-    const isValentine = document.body.classList.contains("valentine");
-    const isChristmas = document.body.classList.contains("christmas");
+  // Sharing buttons setup
+  const resultMessageText = resultMessage.textContent;
+  const shareButtonTwitter = document.getElementById("share-button-twitter");
+  const shareButtonFacebook = document.getElementById("share-button-facebook");
+  const shareButtonWhatsapp = document.getElementById("share-button-whatsapp");
+  const shareButtonLinkedin = document.getElementById("share-button-linkedin");
 
-    if (isValentine || isChristmas) {
-      if (eligibilityPercentage === 100) {
-        resultMessage.textContent = "Yay! You're getting gifts!";
-      } else if (eligibilityPercentage >= 50) {
-        resultMessage.textContent = "You meet some of the requirements. You might still get something!";
-      } else {
-        resultMessage.textContent = "No gift for you enugbe!";
-      }
-    } else {
-      if (eligibilityPercentage === 100) {
-        resultMessage.textContent = "Congratulations! You meet all the requirements.";
-      } else if (eligibilityPercentage >= 50) {
-        resultMessage.textContent = "You meet some of the requirements. Consider improving further.";
-      } else {
-        resultMessage.textContent = "Unfortunately, you do not meet the eligibility criteria. Want to try again?";
-      }
-    }
+  const baseURL = window.location.origin + window.location.pathname;
+  const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessageText + " Check your eligibility at my website!")} ${baseURL}`;
+  const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseURL)}`;
+  const whatsappURL = `https://wa.me/?text=${encodeURIComponent(resultMessageText + " Check your eligibility at my website!")} ${baseURL}`;
+  const linkedinURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseURL)}`;
 
-    // Update the progress bar width
-    const progressBar = document.getElementById("progress-bar");
-    if (progressBar) {
-      progressBar.style.width = `${eligibilityPercentage}%`;
-    }
-
-    // Sharing logic should also be inside the setTimeout to get updated message
-    const resultMessageText = resultMessage.textContent;
-    const shareButtonTwitter = document.getElementById("share-button-twitter");
-    const shareButtonFacebook = document.getElementById("share-button-facebook");
-    const shareButtonWhatsapp = document.getElementById("share-button-whatsapp");
-    const shareButtonLinkedin = document.getElementById("share-button-linkedin");
-
-    const baseURL = window.location.origin + window.location.pathname;
-    const twitterURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessageText + " Check your eligibility at my website!")} ${baseURL}`;
-    const facebookURL = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(baseURL)}`;
-    const whatsappURL = `https://wa.me/?text=${encodeURIComponent(resultMessageText + " Check your eligibility at my website!")} ${baseURL}`;
-    const linkedinURL = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(baseURL)}`;
-
-    if (shareButtonTwitter) {
-      shareButtonTwitter.href = twitterURL;
-    }
-    if (shareButtonFacebook) {
-      shareButtonFacebook.href = facebookURL;
-    }
-    if (shareButtonWhatsapp) {
-      shareButtonWhatsapp.href = whatsappURL;
-    }
-    if (shareButtonLinkedin) {
-      shareButtonLinkedin.href = linkedinURL;
-    }
-
-  }, 2000); // 2-second delay
+  if (shareButtonTwitter) {
+    shareButtonTwitter.href = twitterURL;
+  }
+  if (shareButtonFacebook) {
+    shareButtonFacebook.href = facebookURL;
+  }
+  if (shareButtonWhatsapp) {
+    shareButtonWhatsapp.href = whatsappURL;
+  }
+  if (shareButtonLinkedin) {
+    shareButtonLinkedin.href = linkedinURL;
+  }
 
   // Theme toggle functionality
   const toggleThemeButton = document.getElementById("toggle-theme");
@@ -111,5 +89,24 @@ document.addEventListener("DOMContentLoaded", () => {
       body.classList.add("light-mode");
       localStorage.setItem("theme", "light-mode");
     }
+  });
+
+  // Form submit handler
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();  // Prevent the form from submitting traditionally
+    
+    // Get form data
+    const formData = new FormData(form);
+    const answers = {};
+
+    formData.forEach((value, key) => {
+      answers[key] = value;
+    });
+
+    // Store the answers in localStorage
+    localStorage.setItem("eligibilityAnswers", JSON.stringify(answers));
+
+    // Redirect to the results page
+    window.location.href = "/results.html";
   });
 });
